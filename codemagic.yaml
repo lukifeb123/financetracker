@@ -1,32 +1,50 @@
-name: Build Flutter APK
+workflows:
+  android-release-apk:
+    name: Android APK Build
+    max_build_duration: 30
+    environment:
+      flutter: stable
+      android_signing:
+        - keystore_reference
+    scripts:
+      - name: Get dependencies
+        script: |
+          flutter pub get
+      - name: Build APK
+        script: |
+          flutter build apk --release
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  android-release-aab:
+    name: Android AAB Build
+    max_build_duration: 30
+    environment:
+      flutter: stable
+      android_signing:
+        - keystore_reference
+    scripts:
+      - name: Get dependencies
+        script: |
+          flutter pub get
+      - name: Build AAB
+        script: |
+          flutter build appbundle --release
+    artifacts:
+      - build/app/outputs/bundle/release/app-release.aab
 
-jobs:
-  build:
-    name: Build APK
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.6'  # ganti sesuai versi yang kamu pakai
-
-      - name: Install Dependencies
-        run: flutter pub get
-
-      - name: Build APK (release)
-        run: flutter build apk --release
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+  ios-release:
+    name: iOS Release Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Get dependencies
+        script: |
+          flutter pub get
+      - name: Build iOS
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/ios/iphoneos/Runner.app
