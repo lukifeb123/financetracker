@@ -1,50 +1,15 @@
 workflows:
   android-release-apk:
-    name: Android APK Build
+    name: Build APK tanpa signing
     max_build_duration: 30
     environment:
       flutter: stable
-      android_signing:
-        - keystore_reference
     scripts:
       - name: Get dependencies
         script: |
           flutter pub get
-      - name: Build APK
+      - name: Build APK (release unsigned)
         script: |
           flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
-
-  android-release-aab:
-    name: Android AAB Build
-    max_build_duration: 30
-    environment:
-      flutter: stable
-      android_signing:
-        - keystore_reference
-    scripts:
-      - name: Get dependencies
-        script: |
-          flutter pub get
-      - name: Build AAB
-        script: |
-          flutter build appbundle --release
-    artifacts:
-      - build/app/outputs/bundle/release/app-release.aab
-
-  ios-release:
-    name: iOS Release Build
-    max_build_duration: 60
-    environment:
-      flutter: stable
-      xcode: latest
-    scripts:
-      - name: Get dependencies
-        script: |
-          flutter pub get
-      - name: Build iOS
-        script: |
-          flutter build ios --release --no-codesign
-    artifacts:
-      - build/ios/iphoneos/Runner.app
