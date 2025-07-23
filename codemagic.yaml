@@ -1,15 +1,22 @@
 workflows:
   android-release-apk:
-    name: Build APK tanpa signing
+    name: Build APK (debug mode untuk diagnosis)
     max_build_duration: 30
     environment:
       flutter: stable
     scripts:
+      - name: Cek Versi Flutter
+        script: flutter --version
+
       - name: Get dependencies
-        script: |
-          flutter pub get
-      - name: Build APK (release unsigned)
-        script: |
-          flutter build apk --release
+        script: flutter pub get
+
+      - name: Build Debug APK (untuk cek error)
+        script: flutter build apk --debug
+
+      - name: Build Release APK (bisa gagal jika ada signing)
+        script: flutter build apk --release
+
     artifacts:
+      - build/app/outputs/flutter-apk/app-debug.apk
       - build/app/outputs/flutter-apk/app-release.apk
