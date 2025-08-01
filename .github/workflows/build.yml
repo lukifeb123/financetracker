@@ -36,9 +36,7 @@ jobs:
       continue-on-error: true
     
     - name: Build APK
-      run: flutter build apk --release --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: flutter build apk --release
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
@@ -67,9 +65,7 @@ jobs:
         xcode-version: latest-stable
     
     - name: Build iOS (no sign)
-      run: flutter build ios --release --no-codesign --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: flutter build ios --release --no-codesign
     
     - name: Upload iOS build
       uses: actions/upload-artifact@v4
@@ -93,9 +89,7 @@ jobs:
       run: flutter pub get
     
     - name: Build Web
-      run: flutter build web --release --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: flutter build web --release
     
     - name: Upload Web build
       uses: actions/upload-artifact@v4
