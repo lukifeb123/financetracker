@@ -33,6 +33,9 @@ dependencies:
   universal_html: ^2.2.4
   csv: ^6.0.0
   excel: ^4.0.6
+  
+  # Environment configuration for API keys
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
@@ -44,6 +47,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - .env
   # 🚨 CRITICAL ASSET MANAGEMENT RULES:
   # - DO NOT ADD NEW ASSET DIRECTORIES (assets/svg/, assets/icons/, etc.)
   # - ONLY USE EXISTING AND ITEMS AVAILABLE IN THE DIRECTORIES LISTED ABOVE (assets/, assets/images/)

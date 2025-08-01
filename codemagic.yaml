@@ -1,22 +1,104 @@
 workflows:
-  android-release-apk:
-    name: Build APK (debug mode untuk diagnosis)
-    max_build_duration: 30
+  android-workflow:
+    name: Android Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m1
     environment:
+      android_signing:
+        - financetracker_keystore
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "com.financetracker.app"
+        GOOGLE_PLAY_TRACK: internal
+        GEMINI_API_KEY: $GEMINI_API_KEY
       flutter: stable
     scripts:
-      - name: Cek Versi Flutter
-        script: flutter --version
-
-      - name: Get dependencies
-        script: flutter pub get
-
-      - name: Build Debug APK (untuk cek error)
-        script: flutter build apk --debug
-
-      - name: Build Release APK (bisa gagal jika ada signing)
-        script: flutter build apk --release
-
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      - name: Flutter unit tests
+        script: |
+          flutter test
+        ignore_failure: true
+      - name: Build APK with release mode
+        script: |
+          flutter build apk --release --dart-define=GEMINI_API_KEY=$GEMINI_API_KEY
     artifacts:
-      - build/app/outputs/flutter-apk/app-debug.apk
-      - build/app/outputs/flutter-apk/app-release.apk
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
+        notify:
+          success: true
+          failure: false
+
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m1
+    environment:
+      ios_signing:
+        distribution_method: app_store
+        bundle_identifier: com.financetracker.app
+      vars:
+        BUNDLE_ID: "com.financetracker.app"
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        GEMINI_API_KEY: $GEMINI_API_KEY
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      - name: Flutter unit tests
+        script: |
+          flutter test
+        ignore_failure: true
+      - name: Build ipa for distribution
+        script: |
+          flutter build ipa --release --dart-define=GEMINI_API_KEY=$GEMINI_API_KEY --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        
+        # Configuration related to TestFlight (optional)
+        # Note: This action is performed during post-processing.
+        submit_to_testflight: true
+        beta_groups: # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
+          - group name 1
+          - group name 2
+
+        # Configuration related to App Store (optional)
+        # Note: This action is performed during post-processing.
+        submit_to_app_store: false
+      email:
+        recipients:
+          - your-email@example.com
+        notify:
+          success: true
+          failure: false

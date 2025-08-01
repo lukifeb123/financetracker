@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,7 +7,7 @@ class GeminiService {
   static final GeminiService _instance = GeminiService._internal();
   late final Dio _dio;
   late final GeminiClient _client;
-  static const String apiKey = String.fromEnvironment('GEMINI_API_KEY');
+  late final String apiKey;
 
   factory GeminiService() {
     return _instance;
@@ -17,8 +18,13 @@ class GeminiService {
   }
 
   void _initializeService() {
-    if (apiKey.isEmpty) {
-      throw Exception('GEMINI_API_KEY must be provided via --dart-define');
+    // Get API key from environment variables or compile-time definition
+    apiKey = dotenv.env['GEMINI_API_KEY'] ??
+        const String.fromEnvironment('GEMINI_API_KEY');
+
+    if (apiKey.isEmpty || apiKey == 'your_gemini_api_key_here') {
+      throw Exception(
+          'GEMINI_API_KEY must be provided via .env file or --dart-define');
     }
 
     _dio = Dio(
@@ -26,6 +32,22 @@ class GeminiService {
         baseUrl: 'https://generativelanguage.googleapis.com/v1',
         headers: {
           'Content-Type': 'application/json',
+        },
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
+      ),
+    );
+
+    // Add retry interceptor for better reliability
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (error, handler) {
+          if (error.response?.statusCode == 429) {
+            // Rate limit handling
+            print('Rate limit exceeded, retrying after delay...');
+          }
+          handler.next(error);
         },
       ),
     );
@@ -104,9 +126,107 @@ If you cannot read the receipt clearly, return: {"error": "Could not read receip
     } on DioException catch (e) {
       throw GeminiException(
         statusCode: e.response?.statusCode ?? 500,
-        message: e.response?.data?['error']?['message'] ?? e.message,
+        message: e.response?.data?['error']?['message'] ??
+            e.message ??
+            'Network error occurred',
+      );
+    } catch (e) {
+      throw GeminiException(
+        statusCode: 500,
+        message: 'Unexpected error: $e',
       );
     }
+  }
+
+  Future<String> generateFinancialInsights({
+    required List<Map<String, dynamic>> transactions,
+    required DateTime currentMonth,
+  }) async {
+    try {
+      final transactionSummary =
+          _buildTransactionSummary(transactions, currentMonth);
+
+      final response = await dio.post(
+        '/models/gemini-1.5-flash:generateContent',
+        queryParameters: {
+          'key': apiKey,
+        },
+        data: {
+          'contents': [
+            {
+              'role': 'user',
+              'parts': [
+                {
+                  'text':
+                      '''Analyze the following financial data and provide insights in Indonesian:
+
+$transactionSummary
+
+Please provide:
+1. Spending pattern analysis
+2. Budget recommendations
+3. Areas for improvement
+4. Financial health score (1-10)
+
+Keep the response concise and actionable, maximum 300 words.'''
+                }
+              ]
+            }
+          ],
+          'generationConfig': {
+            'maxOutputTokens': 512,
+            'temperature': 0.3,
+          },
+        },
+      );
+
+      if (response.data['candidates'] != null &&
+          response.data['candidates'].isNotEmpty &&
+          response.data['candidates'][0]['content'] != null) {
+        final parts = response.data['candidates'][0]['content']['parts'];
+        final text = parts.isNotEmpty ? parts[0]['text'] : '';
+        return text.trim();
+      } else {
+        return 'Tidak dapat menganalisis data keuangan saat ini.';
+      }
+    } catch (e) {
+      print('Error generating financial insights: $e');
+      return 'Analisis keuangan tidak tersedia. Silakan coba lagi nanti.';
+    }
+  }
+
+  String _buildTransactionSummary(
+      List<Map<String, dynamic>> transactions, DateTime currentMonth) {
+    final currentMonthTransactions = transactions.where((t) {
+      final date = t['date'] as DateTime;
+      return date.year == currentMonth.year && date.month == currentMonth.month;
+    }).toList();
+
+    double totalIncome = 0;
+    double totalExpense = 0;
+    Map<String, double> categoryExpenses = {};
+
+    for (final transaction in currentMonthTransactions) {
+      final amount = transaction['amount'] as double;
+      if (transaction['type'] == 'income') {
+        totalIncome += amount;
+      } else {
+        totalExpense += amount;
+        final category = transaction['category'] as String;
+        categoryExpenses[category] = (categoryExpenses[category] ?? 0) + amount;
+      }
+    }
+
+    return '''
+Monthly Financial Summary:
+- Total Income: Rp ${totalIncome.toStringAsFixed(0)}
+- Total Expenses: Rp ${totalExpense.toStringAsFixed(0)}
+- Net Balance: Rp ${(totalIncome - totalExpense).toStringAsFixed(0)}
+- Transaction Count: ${currentMonthTransactions.length}
+
+Category Breakdown:
+${categoryExpenses.entries.map((e) => '- ${e.key}: Rp ${e.value.toStringAsFixed(0)}').join('\n')}
+''';
   }
 
   Future<Completion> createChat({
@@ -156,7 +276,42 @@ If you cannot read the receipt clearly, return: {"error": "Could not read receip
     } on DioException catch (e) {
       throw GeminiException(
         statusCode: e.response?.statusCode ?? 500,
-        message: e.response?.data?['error']?['message'] ?? e.message,
+        message: e.response?.data?['error']?['message'] ??
+            e.message ??
+            'Network error occurred',
+      );
+    } catch (e) {
+      throw GeminiException(
+        statusCode: 500,
+        message: 'Unexpected error: $e',
+      );
+    }
+  }
+
+  Future<List<String>> listModels() async {
+    try {
+      final response = await dio.get(
+        '/models',
+        queryParameters: {
+          'key': apiKey,
+        },
+      );
+
+      final modelList = (response.data['models'] as List)
+          .map((model) => model['name'] as String)
+          .toList();
+      return modelList;
+    } on DioException catch (e) {
+      throw GeminiException(
+        statusCode: e.response?.statusCode ?? 500,
+        message: e.response?.data?['error']?['message'] ??
+            e.message ??
+            'Failed to fetch models',
+      );
+    } catch (e) {
+      throw GeminiException(
+        statusCode: 500,
+        message: 'Unexpected error fetching models: ${e.toString()}',
       );
     }
   }

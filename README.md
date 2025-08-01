@@ -1,142 +1,198 @@
-# Flutter
+# Finance Tracker
 
-A modern Flutter-based mobile application utilizing the latest mobile development technologies and tools for building responsive cross-platform applications.
+A comprehensive Flutter-based finance tracking application with AI-powered insights using Google's Gemini API.
 
-## 📋 Prerequisites
+## Features
 
-- Flutter SDK (^3.29.2)
-- Dart SDK
-- Android Studio / VS Code with Flutter extensions
-- Android SDK / Xcode (for iOS development)
+- 📱 Cross-platform support (Android, iOS, Web)
+- 💰 Transaction management (income/expense tracking)
+- 📊 Data visualization with charts and analytics
+- 🤖 AI-powered financial insights via Gemini API
+- 📷 Receipt scanning with OCR
+- 📁 CSV/Excel data import
+- 📈 Budget tracking and progress monitoring
+- 🎨 Modern Material Design 3 UI
 
-## 🛠️ Installation
+## Getting Started
 
-1. Install dependencies:
+### Prerequisites
+
+- Flutter SDK 3.16.0 or higher
+- Dart SDK 3.2.0 or higher
+- Android Studio / VS Code
+- Gemini API key (optional, for AI features)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd financetracker
+```
+
+2. Install dependencies:
 ```bash
 flutter pub get
 ```
 
-2. Run the application:
+3. Set up environment variables:
+   - Copy `.env.example` to `.env`
+   - Add your API keys (optional):
+   ```
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 
-To run the app with environment variables defined in an env.json file, follow the steps mentioned below:
-1. Through CLI
-    ```bash
-    flutter run --dart-define-from-file=env.json
-    ```
-2. For VSCode
-    - Open .vscode/launch.json (create it if it doesn't exist).
-    - Add or modify your launch configuration to include --dart-define-from-file:
-    ```json
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "name": "Launch",
-                "request": "launch",
-                "type": "dart",
-                "program": "lib/main.dart",
-                "args": [
-                    "--dart-define-from-file",
-                    "env.json"
-                ]
-            }
-        ]
-    }
-    ```
-3. For IntelliJ / Android Studio
-    - Go to Run > Edit Configurations.
-    - Select your Flutter configuration or create a new one.
-    - Add the following to the "Additional arguments" field:
-    ```bash
-    --dart-define-from-file=env.json
-    ```
-
-## 📁 Project Structure
-
-```
-flutter_app/
-├── android/            # Android-specific configuration
-├── ios/                # iOS-specific configuration
-├── lib/
-│   ├── core/           # Core utilities and services
-│   │   └── utils/      # Utility classes
-│   ├── presentation/   # UI screens and widgets
-│   │   └── splash_screen/ # Splash screen implementation
-│   ├── routes/         # Application routing
-│   ├── theme/          # Theme configuration
-│   ├── widgets/        # Reusable UI components
-│   └── main.dart       # Application entry point
-├── assets/             # Static assets (images, fonts, etc.)
-├── pubspec.yaml        # Project dependencies and configuration
-└── README.md           # Project documentation
-```
-
-## 🧩 Adding Routes
-
-To add new routes to the application, update the `lib/routes/app_routes.dart` file:
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:package_name/presentation/home_screen/home_screen.dart';
-
-class AppRoutes {
-  static const String initial = '/';
-  static const String home = '/home';
-
-  static Map<String, WidgetBuilder> routes = {
-    initial: (context) => const SplashScreen(),
-    home: (context) => const HomeScreen(),
-    // Add more routes as needed
-  }
-}
-```
-
-## 🎨 Theming
-
-This project includes a comprehensive theming system with both light and dark themes:
-
-```dart
-// Access the current theme
-ThemeData theme = Theme.of(context);
-
-// Use theme colors
-Color primaryColor = theme.colorScheme.primary;
-```
-
-The theme configuration includes:
-- Color schemes for light and dark modes
-- Typography styles
-- Button themes
-- Input decoration themes
-- Card and dialog themes
-
-## 📱 Responsive Design
-
-The app is built with responsive design using the Sizer package:
-
-```dart
-// Example of responsive sizing
-Container(
-  width: 50.w, // 50% of screen width
-  height: 20.h, // 20% of screen height
-  child: Text('Responsive Container'),
-)
-```
-## 📦 Deployment
-
-Build the application for production:
-
+4. Run the application:
 ```bash
-# For Android
-flutter build apk --release
-
-# For iOS
-flutter build ios --release
+flutter run
 ```
 
-## 🙏 Acknowledgments
-- Built with [Rocket.new](https://rocket.new)
-- Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
-- Styled with Material Design
+### Building for Production
 
-Built with ❤️ on Rocket.new
+#### Android APK
+```bash
+flutter build apk --release --dart-define=GEMINI_API_KEY=your_api_key
+```
+
+#### iOS
+```bash
+flutter build ipa --release --dart-define=GEMINI_API_KEY=your_api_key
+```
+
+#### Web
+```bash
+flutter build web --release --dart-define=GEMINI_API_KEY=your_api_key
+```
+
+## CI/CD Setup
+
+### GitHub Actions
+
+The project includes GitHub Actions workflows for automated building:
+
+1. Create the following secrets in your GitHub repository:
+   - `GEMINI_API_KEY`: Your Gemini API key
+
+2. Push to `main` or `develop` branch to trigger builds
+
+### Codemagic
+
+The project includes Codemagic configuration:
+
+1. Connect your repository to Codemagic
+2. Set up the following environment variables:
+   - `GEMINI_API_KEY`: Your Gemini API key
+3. Configure signing certificates for iOS/Android releases
+
+## Project Structure
+
+```
+lib/
+├── core/                    # Core functionality and exports
+├── presentation/            # UI screens and widgets
+│   ├── dashboard_home/      # Home dashboard
+│   ├── transaction_history/ # Transaction listing
+│   ├── analytics_dashboard/ # Analytics and charts
+│   ├── add_transaction/     # Add/edit transactions
+│   ├── receipt_scanner/     # Receipt OCR scanning
+│   ├── category_management/ # Category management
+│   └── data_import/         # CSV/Excel import
+├── services/                # API services
+│   └── gemini_service.dart  # Gemini AI integration
+├── theme/                   # App theming
+├── widgets/                 # Reusable widgets
+└── routes/                  # Navigation routes
+```
+
+## API Integration
+
+### Gemini AI Features
+
+- **Receipt Analysis**: Automatically extract transaction data from receipt images
+- **Financial Insights**: AI-generated spending analysis and recommendations
+- **Smart Categorization**: Intelligent transaction categorization
+
+To get a Gemini API key:
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Create a new API key
+3. Add it to your `.env` file or pass via `--dart-define`
+
+## Development
+
+### Code Style
+
+The project follows Flutter/Dart conventions with additional linting rules defined in `analysis_options.yaml`.
+
+### Testing
+
+Run tests with:
+```bash
+flutter test
+```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if needed
+5. Submit a pull request
+
+## Deployment
+
+### Android
+
+1. Generate a signed APK/AAB:
+```bash
+flutter build appbundle --release --dart-define=GEMINI_API_KEY=your_api_key
+```
+
+2. Upload to Google Play Console
+
+### iOS
+
+1. Build for App Store:
+```bash
+flutter build ipa --release --dart-define=GEMINI_API_KEY=your_api_key
+```
+
+2. Upload via Xcode or Application Loader
+
+### Web
+
+1. Build and deploy:
+```bash
+flutter build web --release --dart-define=GEMINI_API_KEY=your_api_key
+```
+
+2. Deploy to your hosting provider
+
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `GEMINI_API_KEY` | Google Gemini API key for AI features | No |
+| `SUPABASE_URL` | Supabase project URL | No |
+| `SUPABASE_ANON_KEY` | Supabase anonymous key | No |
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Build fails with missing API key**: Set the GEMINI_API_KEY environment variable or pass it via --dart-define
+2. **Gradle build errors**: Clean the build with `flutter clean && flutter pub get`
+3. **iOS build errors**: Run `cd ios && pod install && cd ..`
+
+### Performance
+
+- The app uses efficient state management
+- Images are cached using `cached_network_image`
+- Large lists use Flutter's built-in optimization
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the development team.

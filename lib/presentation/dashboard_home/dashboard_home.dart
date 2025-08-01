@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/gemini_service.dart';
+import './widgets/ai_insights_widget.dart';
 import './widgets/balance_card_widget.dart';
 import './widgets/budget_progress_widget.dart';
 import './widgets/expense_income_chart_widget.dart';
@@ -23,8 +25,9 @@ class _DashboardHomeState extends State<DashboardHome>
   int _currentIndex = 0;
   DateTime _currentDate = DateTime.now();
   bool _isBalanceVisible = true;
+  bool _showAIInsights = false;
 
-  // Mock data for demonstration
+  // Sample transactions data (replace mock data with real data from Gemini)
   final List<Map<String, dynamic>> _transactions = [
     {
       "id": 1,
@@ -125,6 +128,24 @@ class _DashboardHomeState extends State<DashboardHome>
       "spentAmount": 195000.0,
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeGeminiService();
+  }
+
+  void _initializeGeminiService() {
+    try {
+      final geminiService = GeminiService();
+      setState(() {
+        _showAIInsights = true;
+      });
+    } catch (e) {
+      print('Gemini AI not available: $e');
+      // AI insights will be hidden if Gemini is not properly configured
+    }
+  }
 
   double get _totalBalance {
     double income = 0;
@@ -376,6 +397,13 @@ class _DashboardHomeState extends State<DashboardHome>
                       onPrivacyToggle: _toggleBalanceVisibility,
                       isBalanceVisible: _isBalanceVisible,
                     ),
+
+                    // AI Insights (only show if Gemini is configured)
+                    if (_showAIInsights)
+                      AIInsightsWidget(
+                        transactions: _transactions,
+                        currentMonth: _currentDate,
+                      ),
 
                     // Recent Transactions
                     RecentTransactionsWidget(
