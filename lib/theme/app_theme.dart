@@ -6,10 +6,35 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
-  // ... [color definitions unchanged] ...
+  // Define your custom colors here
+  static const Color primaryLight = Color(0xFF4A90E2);
+  static const Color primaryDark = Color(0xFF1565C0);
+  static const Color secondaryLight = Color(0xFF50E3C2);
+  static const Color secondaryDark = Color(0xFF00ACC1);
+  static const Color accentLight = Color(0xFFFFC107);
+  static const Color accentDark = Color(0xFFFFA000);
+  static const Color errorLight = Color(0xFFD32F2F);
+  static const Color errorDark = Color(0xFFEF5350);
+  static const Color surfaceLight = Colors.white;
+  static const Color surfaceDark = Color(0xFF121212);
+  static const Color backgroundLight = Color(0xFFF5F5F5);
+  static const Color backgroundDark = Color(0xFF121212);
+  static const Color cardLight = Colors.white;
+  static const Color cardDark = Color(0xFF1E1E1E);
+  static const Color dividerLight = Color(0xFFBDBDBD);
+  static const Color dividerDark = Color(0xFF424242);
+  static const Color shadowLight = Colors.black12;
+  static const Color shadowDark = Colors.black45;
+  static const Color borderLight = Color(0xFFDDDDDD);
+  static const Color borderDark = Color(0xFF444444);
+  static const Color textPrimaryLight = Color(0xFF212121);
+  static const Color textSecondaryLight = Color(0xFF757575);
+  static const Color textPrimaryDark = Color(0xFFE0E0E0);
+  static const Color textSecondaryDark = Color(0xFFB0BEC5);
 
   /// Light theme configuration
   static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.light,
     colorScheme: ColorScheme(
       brightness: Brightness.light,
@@ -42,7 +67,6 @@ class AppTheme {
     cardColor: cardLight,
     dividerColor: dividerLight,
 
-    // AppBar Theme - Clean and professional
     appBarTheme: AppBarTheme(
       backgroundColor: surfaceLight,
       foregroundColor: textPrimaryLight,
@@ -56,7 +80,6 @@ class AppTheme {
       iconTheme: IconThemeData(color: textPrimaryLight),
     ),
 
-    // Card Theme - Subtle elevation with rounded corners
     cardTheme: CardThemeData(
       color: cardLight,
       elevation: 2.0,
@@ -67,9 +90,6 @@ class AppTheme {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
 
-    // ... [other themes unchanged] ...
-
-    // Tab Bar Theme
     tabBarTheme: TabBarThemeData(
       labelColor: primaryLight,
       unselectedLabelColor: textSecondaryLight,
@@ -85,12 +105,12 @@ class AppTheme {
       ),
     ),
 
-    // ... [rest unchanged] ...
     dialogTheme: DialogThemeData(backgroundColor: surfaceLight),
   );
 
   /// Dark theme configuration
   static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme(
       brightness: Brightness.dark,
@@ -123,7 +143,6 @@ class AppTheme {
     cardColor: cardDark,
     dividerColor: dividerDark,
 
-    // AppBar Theme - Dark variant
     appBarTheme: AppBarTheme(
       backgroundColor: surfaceDark,
       foregroundColor: textPrimaryDark,
@@ -137,7 +156,6 @@ class AppTheme {
       iconTheme: IconThemeData(color: textPrimaryDark),
     ),
 
-    // Card Theme - Dark variant
     cardTheme: CardThemeData(
       color: cardDark,
       elevation: 2.0,
@@ -148,9 +166,6 @@ class AppTheme {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
 
-    // ... [other themes unchanged] ...
-
-    // Tab Bar Theme - Dark variant
     tabBarTheme: TabBarThemeData(
       labelColor: primaryDark,
       unselectedLabelColor: textSecondaryDark,
@@ -166,9 +181,6 @@ class AppTheme {
       ),
     ),
 
-    // ... [rest unchanged] ...
     dialogTheme: DialogThemeData(backgroundColor: surfaceDark),
   );
-
-  // ... [helpers unchanged] ...
 }
