@@ -183,4 +183,50 @@ class AppTheme {
 
     dialogTheme: DialogThemeData(backgroundColor: surfaceDark),
   );
+   // === COLOR HELPERS ===
+
+  /// Warna success berdasarkan secondary color.
+  static Color getSuccessColor(BuildContext context) {
+    return Theme.of(context).colorScheme.secondary;
+  }
+
+  /// Warna warning berdasarkan tertiary color.
+  static Color getWarningColor(BuildContext context) {
+    return Theme.of(context).colorScheme.tertiary;
+  }
+
+  /// Warna error utama dari theme.
+  static Color getErrorColor(BuildContext context) {
+    return Theme.of(context).colorScheme.error;
+  }
+
+  /// Warna card dari theme.
+  static Color getCardColor(BuildContext context) {
+    return Theme.of(context).cardColor;
+  }
+
+  /// Warna divider dari theme.
+  static Color getDividerColor(BuildContext context) {
+    return Theme.of(context).dividerColor;
+  }
+
+  /// Warna teks utama (onSurface).
+  static Color getTextPrimaryColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
+  /// Warna teks sekunder (onSurfaceVariant).
+  static Color getTextSecondaryColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurfaceVariant;
+  }
+
+  /// Warna shadow dari theme.
+  static Color getShadowColor(BuildContext context) {
+    return Theme.of(context).colorScheme.shadow;
+  }
+
+  /// Warna border dari theme.
+  static Color getBorderColor(BuildContext context) {
+    return Theme.of(context).colorScheme.outline;
+  }
 }
