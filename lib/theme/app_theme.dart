@@ -229,4 +229,20 @@ class AppTheme {
   static Color getBorderColor(BuildContext context) {
     return Theme.of(context).colorScheme.outline;
   }
+  /// Accent color dari theme (biasanya digunakan untuk highlight).
+static Color getAccentColor(BuildContext context) {
+  return Theme.of(context).colorScheme.tertiary;
+}
+
+/// Style teks utama untuk data (contoh: total saldo, nilai).
+static TextStyle getDataTextStyle(BuildContext context) {
+  return Theme.of(context).textTheme.bodyLarge ??
+      GoogleFonts.inter(fontSize: 16);
+}
+
+/// Warna success ringan (untuk background hijau muda, dll).
+static Color get successLight => const Color(0xFFD1FAE5); // hijau pastel
+
+/// Warna warning ringan (untuk background kuning muda, dll).
+static Color get warningLight => const Color(0xFFFFF7E0); // kuning pastel
 }
