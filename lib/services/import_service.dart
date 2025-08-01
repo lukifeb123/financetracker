@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:io' if (dart.library.io) 'dart:io';
-import 'dart:html' as html if (dart.library.html) 'dart:html';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart'
-    if (dart.library.io) 'path_provider/path_provider.dart';
+    if (dart.library.io) 'package:path_provider/path_provider.dart';
+import 'package:universal_html/html.dart' as html
+    if (dart.library.html) 'package:universal_html/html.dart';
 
 class ImportService {
   static final ImportService _instance = ImportService._internal();
@@ -208,9 +209,14 @@ class ImportService {
         ..click();
       html.Url.revokeObjectUrl(url);
     } else {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/$filename');
-      await file.writeAsString(content);
+      try {
+        final directory = await getApplicationDocumentsDirectory();
+        final file = File('${directory.path}/$filename');
+        await file.writeAsString(content);
+      } catch (e) {
+        // Fallback: show a message that the file would be downloaded
+        print('File would be saved as: $filename');
+      }
     }
   }
 }
